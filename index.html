@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --accent-navy: #0F172A;
@@ -56,12 +58,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 
-                <!-- Brand & Team Logo Section (ตรงกับไฟล์ .png ใน GitHub แล้ว) -->
+                <!-- Brand & Team Logo Section -->
                 <div class="flex items-center space-x-3">
                     <img src="LOGO สีดำ.png" alt="NEXER 22641 Logo" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='LOGO ขาว.png';">
                 </div>
 
-                <!-- Main Section Toggle Tabs (สลับ ตารางซ้อม / บัญชีการเงิน) -->
+                <!-- Main Section Toggle Tabs -->
                 <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                     <button onclick="switchMainView('schedule-system')" id="main-btn-schedule" class="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-2 rounded-lg font-bold text-sm text-slate-600 transition duration-200 main-tab-active">
                         <i class="fas fa-calendar-alt"></i>
@@ -288,6 +290,17 @@
                         <div class="text-xl font-bold text-slate-800" id="sum-gen-expense">0.00 ฿</div>
                     </div>
                 </div>
+
+                <!-- เพิ่มส่วนแสดงผลกราฟแผนภูมิวงกลม (Payment / Expense Breakdown Chart) -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                        <i class="fa-solid fa-chart-pie text-blue-600"></i>
+                        <span>สัดส่วนการใช้จ่ายงบประมาณ (Expense Breakdown)</span>
+                    </h3>
+                    <div class="relative w-full max-w-md mx-auto h-64 sm:h-80 flex justify-center items-center">
+                        <canvas id="financePieChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <!-- FIN TAB 2: รายการล่าสุด -->
@@ -380,6 +393,9 @@
 
     <!-- LOGIC SCRIPT -->
     <script>
+        // Global variables for Chart
+        let financeChart = null;
+
         // ==========================================
         // MAIN VIEW SWITCHER (ตารางซ้อม / การเงิน)
         // ==========================================
@@ -720,6 +736,61 @@
             });
         }
 
+        function renderFinanceChart(eqExpense, genExpense, balance) {
+            const ctx = document.getElementById('financePieChart').getContext('2d');
+            
+            // ลบกราฟเดิมก่อนสร้างใหม่ป้องกันปัญหาแสดงผลซ้อนกัน
+            if (financeChart) {
+                financeChart.destroy();
+            }
+
+            financeChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['ค่าอุปกรณ์', 'ค่าใช้จ่ายทั่วไป', 'เงินคงเหลือในบัญชี'],
+                    datasets: [{
+                        data: [eqExpense, genExpense, balance > 0 ? balance : 0],
+                        backgroundColor: [
+                            '#1D4ED8', // Blue
+                            '#0284C7', // Sky Blue
+                            '#10B981'  // Emerald Green
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    family: 'Prompt',
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed.toLocaleString('th-TH') + ' ฿';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         async function loadAllFinanceData() {
             const refreshIcon = document.getElementById('finRefreshIcon');
             if(refreshIcon) refreshIcon.classList.add('fa-spin');
@@ -854,6 +925,9 @@
                 document.getElementById('sum-expense').innerText = formatCurrency(totalExpense);
                 document.getElementById('sum-eq-expense').innerText = formatCurrency(calcEq);
                 document.getElementById('sum-gen-expense').innerText = formatCurrency(calcGen);
+
+                // แสดงผลกราฟวงกลมสรุปสัดส่วนรายจ่าย Real-time
+                renderFinanceChart(calcEq, calcGen, balance);
 
                 // 6. รายการล่าสุด
                 let allTransactions = [
