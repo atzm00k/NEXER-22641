@@ -87,7 +87,7 @@
         <!-- ========================================== -->
         <div id="main-view-schedule" class="space-y-6">
             
-            <!-- Schedule Navigation Header Bar (ลบประวัติย้อนหลังออกแล้ว) -->
+            <!-- Schedule Navigation Header Bar -->
             <div class="bg-white border border-blue-100 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
                 <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
                     <button onclick="switchScheduleTab('today')" id="tab-schedule-today" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap sub-tab-active">
@@ -177,7 +177,7 @@
                 </div>
             </div>
 
-            <!-- Sub Tab 3: ปฏิทิน (รองรับการคลิกดู Pop-up) -->
+            <!-- Sub Tab 3: ปฏิทิน -->
             <div id="schedule-page-calendar" class="hidden">
                 <div class="bg-white border border-blue-100 rounded-xl p-6 shadow-sm">
                     <div class="flex justify-between items-center mb-6">
@@ -196,8 +196,8 @@
 
         </div>
 
-        <!-- Pop-up Modal สำหรับแสดงรายละเอียดเมื่อกดเลือกวันบนปฏิทิน -->
-        <div id="calendarDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <!-- Pop-up Modal สำหรับแสดงรายละเอียดเมื่อคลิกวันที่บนปฏิทิน -->
+        <div id="calendarDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4" style="display: none;">
             <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 transform transition-all">
                 <!-- Header ของ Pop-up พร้อมปุ่มกากบาทขวาบน -->
                 <div class="bg-gradient-to-r from-blue-900 to-indigo-900 p-5 text-white flex justify-between items-start relative">
@@ -210,7 +210,7 @@
                         <i class="fas fa-xmark text-lg"></i>
                     </button>
                 </div>
-                <!-- รายละเอียดเนื้อหาใน Pop-up -->
+                <!-- รายละเอียดเนื้อหาใน Pop-up (ย้ายมาจากหน้าตารางปัจจุบัน/อนาคต) -->
                 <div class="p-6 space-y-4 text-slate-800">
                     <div class="bg-blue-50/60 rounded-xl p-4 border border-blue-100">
                         <div class="flex items-center space-x-2 text-blue-800 font-semibold mb-1 text-sm">
@@ -305,7 +305,7 @@
                     </div>
                 </div>
 
-                <!-- เพิ่มส่วนแสดงผลกราฟแผนภูมิวงกลม (Payment / Expense Breakdown Chart) -->
+                <!-- ส่วนแสดงผลกราฟแผนภูมิวงกลม -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center space-x-2">
                         <i class="fa-solid fa-chart-pie text-blue-600"></i>
@@ -407,7 +407,6 @@
 
     <!-- LOGIC SCRIPT -->
     <script>
-        // Global variables for Chart
         let financeChart = null;
 
         // ==========================================
@@ -429,7 +428,7 @@
                 finView.classList.remove('hidden');
                 schedBtn.classList.remove('main-tab-active');
                 finBtn.classList.add('main-tab-active');
-                loadAllFinanceData(); // Auto load finance data when switched
+                loadAllFinanceData();
             }
         }
 
@@ -649,7 +648,6 @@
                 const cell = document.createElement('div');
                 cell.className = `h-24 p-2 rounded-lg border flex flex-col justify-between text-xs transition cursor-pointer hover:border-blue-400 hover:shadow-md ${isToday ? 'border-blue-500 bg-blue-50/50' : 'border-blue-100 bg-white'}`;
                 
-                // เพิ่ม Event Listener เมื่อกดคลิกที่วันบนปฏิทิน
                 cell.onclick = () => openCalendarModal(cellDate, dayData);
 
                 let statusContent = '';
@@ -677,7 +675,7 @@
             }
         }
 
-        // ฟังก์ชันเปิด-ปิด Pop-up Modal บนปฏิทิน
+        // ฟังก์ชันเปิด-ปิด Pop-up Modal
         function openCalendarModal(cellDate, dayData) {
             const modal = document.getElementById('calendarDetailModal');
             
@@ -698,11 +696,11 @@
                 document.getElementById('modalPartLeaveNote').innerText = '-';
             }
 
-            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
         }
 
         function closeCalendarModal() {
-            document.getElementById('calendarDetailModal').classList.add('hidden');
+            document.getElementById('calendarDetailModal').style.display = 'none';
         }
 
         function changeMonth(offset) {
@@ -754,7 +752,6 @@
         function renderFinanceChart(eqExpense, genExpense, balance) {
             const ctx = document.getElementById('financePieChart').getContext('2d');
             
-            // ลบกราฟเดิมก่อนสร้างใหม่ป้องกันปัญหาแสดงผลซ้อนกัน
             if (financeChart) {
                 financeChart.destroy();
             }
@@ -766,9 +763,9 @@
                     datasets: [{
                         data: [eqExpense, genExpense, balance > 0 ? balance : 0],
                         backgroundColor: [
-                            '#1D4ED8', // Blue
-                            '#0284C7', // Sky Blue
-                            '#10B981'  // Emerald Green
+                            '#1D4ED8',
+                            '#0284C7',
+                            '#10B981'
                         ],
                         borderWidth: 2,
                         borderColor: '#FFFFFF'
@@ -811,7 +808,6 @@
             if(refreshIcon) refreshIcon.classList.add('fa-spin');
 
             try {
-                // 1. รายรับ
                 const incomeRows = await fetchFinanceSheetData('รายรับ');
                 let incomeList = [];
                 let calcIncomeOnly = 0;
@@ -842,7 +838,6 @@
                 });
                 document.getElementById('table-income').innerHTML = incomeHTML || '<tr><td colspan="3" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
 
-                // 2. รายจ่ายอุปกรณ์
                 const eqRows = await fetchFinanceSheetData('รายจ่ายอุปกรณ์');
                 let eqExpenseList = [];
                 let calcEq = 0;
@@ -875,7 +870,6 @@
                 });
                 document.getElementById('table-eq-expenses').innerHTML = eqHTML || '<tr><td colspan="4" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
 
-                // 3. รายจ่ายทั่วไป
                 const genRows = await fetchFinanceSheetData('รายจ่ายทั่วไป');
                 let genExpenseList = [];
                 let calcGen = 0;
@@ -906,7 +900,6 @@
                 });
                 document.getElementById('table-gen-expenses').innerHTML = genHTML || '<tr><td colspan="3" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
 
-                // 4. Sponsor
                 const sponsorRows = await fetchFinanceSheetData('Sponsor');
                 let sponsorHTML = '';
                 let calcSponsorTotal = 0;
@@ -930,7 +923,6 @@
                 }
                 document.getElementById('sponsor-list').innerHTML = sponsorHTML || '<div class="text-slate-400 text-xs">ไม่มีข้อมูล Sponsor</div>';
 
-                // 5. คำนวณสรุป
                 let totalExpense = calcEq + calcGen;
                 let totalIncome = calcIncomeOnly + calcSponsorTotal;
                 let balance = totalIncome - totalExpense;
@@ -941,10 +933,8 @@
                 document.getElementById('sum-eq-expense').innerText = formatCurrency(calcEq);
                 document.getElementById('sum-gen-expense').innerText = formatCurrency(calcGen);
 
-                // แสดงผลกราฟวงกลมสรุปสัดส่วนรายจ่าย Real-time
                 renderFinanceChart(calcEq, calcGen, balance);
 
-                // 6. รายการล่าสุด
                 let allTransactions = [
                     ...incomeList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.amount, isIncome: true, type: 'รายรับ' })),
                     ...eqExpenseList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.price, isIncome: false, type: 'ค่าอุปกรณ์' })),
