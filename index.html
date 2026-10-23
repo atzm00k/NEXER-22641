@@ -38,7 +38,7 @@
             background-color: #0F172A !important;
             color: #FFFFFF !important;
         }
-        .badge-income { color: #a992f7; font-weight: 600; }
+        .badge-income { color: #059669; font-weight: 600; }
         .badge-expense { color: #E11D48; font-weight: 600; }
         .type-tag {
             background: #E0F2FE;
@@ -87,20 +87,14 @@
         <!-- ========================================== -->
         <div id="main-view-schedule" class="space-y-6">
             
-            <!-- Schedule Navigation Header Bar -->
+            <!-- Schedule Navigation Header Bar (เหลือเฉพาะ วันนี้ และ มุมมองปฏิทิน) -->
             <div class="bg-white border border-blue-100 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
                 <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
                     <button onclick="switchScheduleTab('today')" id="tab-schedule-today" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap sub-tab-active">
                         <i class="fas fa-calendar-day mr-1.5"></i>วันนี้ (Mainหลัก)
                     </button>
-                    <button onclick="switchScheduleTab('upcoming')" id="tab-schedule-upcoming" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
-                        <i class="fas fa-list-ul mr-1.5"></i>ตารางซ้อมปัจจุบัน/อนาคต
-                    </button>
                     <button onclick="switchScheduleTab('calendar')" id="tab-schedule-calendar" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
                         <i class="fas fa-calendar-grid mr-1.5"></i>มุมมองปฏิทิน
-                    </button>
-                    <button onclick="switchScheduleTab('history')" id="tab-schedule-history" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
-                        <i class="fas fa-history mr-1.5"></i>ประวัติย้อนหลัง
                     </button>
                 </nav>
 
@@ -157,30 +151,7 @@
                 </div>
             </div>
 
-            <!-- Sub Tab 2: ตารางปัจจุบัน/อนาคต -->
-            <div id="schedule-page-upcoming" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-blue-950">ตารางซ้อมตั้งแต่วันนี้เป็นต้นไป</h2>
-                    <span id="upcomingCount" class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full">0 รายการ</span>
-                </div>
-                <div class="overflow-x-auto bg-white border border-blue-100 rounded-xl shadow-sm">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-blue-50/80 border-b border-blue-100 text-xs font-semibold text-blue-900 uppercase">
-                                <th class="py-3 px-4">วันที่ / วัน</th>
-                                <th class="py-3 px-4">สถานะการซ้อม</th>
-                                <th class="py-3 px-4">ผู้ลาทั้งวัน</th>
-                                <th class="py-3 px-4">หมายเหตุ</th>
-                                <th class="py-3 px-4">ผู้ลาช่วงเวลา</th>
-                                <th class="py-3 px-4">หมายเหตุ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scheduleTableBody" class="divide-y divide-blue-50 text-sm"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Sub Tab 3: ปฏิทิน -->
+            <!-- Sub Tab 2: ปฏิทิน -->
             <div id="schedule-page-calendar" class="hidden">
                 <div class="bg-white border border-blue-100 rounded-xl p-6 shadow-sm">
                     <div class="flex justify-between items-center mb-6">
@@ -197,29 +168,77 @@
                 </div>
             </div>
 
-            <!-- Sub Tab 4: ประวัติย้อนหลัง -->
-            <div id="schedule-page-history" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-blue-950">ประวัติการซ้อมย้อนหลัง</h2>
-                    <span id="historyCount" class="text-xs bg-blue-50 text-blue-800 font-semibold px-2.5 py-1 rounded-full">0 รายการ</span>
-                </div>
-                <div class="overflow-x-auto bg-white border border-blue-100 rounded-xl shadow-sm">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-blue-50/50 border-b border-blue-100 text-xs font-semibold text-blue-900/80 uppercase">
-                                <th class="py-3 px-4">วันที่ / วัน</th>
-                                <th class="py-3 px-4">สถานะการซ้อม</th>
-                                <th class="py-3 px-4">ผู้ลาทั้งวัน</th>
-                                <th class="py-3 px-4">หมายเหตุ</th>
-                                <th class="py-3 px-4">ผู้ลาช่วงเวลา</th>
-                                <th class="py-3 px-4">หมายเหตุ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody" class="divide-y divide-blue-50 text-sm text-blue-950"></tbody>
-                    </table>
-                </div>
-            </div>
+        </div>
 
+        <!-- ========================================== -->
+        <!-- POP-UP MODAL: แสดงรายละเอียดวันซ้อมจากปฏิทิน -->
+        <!-- ========================================== -->
+        <div id="scheduleDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+                
+                <!-- Modal Header -->
+                <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-calendar-day text-sky-400 text-xl"></i>
+                        <div>
+                            <h3 id="modalDateTitle" class="text-lg font-bold text-white">-</h3>
+                            <p id="modalDayOfWeek" class="text-xs text-slate-300">-</p>
+                        </div>
+                    </div>
+                    <!-- ปุ่มกากบาทขวาบน -->
+                    <button onclick="closeScheduleModal()" class="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-slate-800 flex items-center justify-center">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body (รายละเอียดแบบตาราง/การ์ด) -->
+                <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+                    
+                    <!-- สถานะการซ้อม -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <span class="text-sm font-semibold text-slate-700">สถานะการซ้อม:</span>
+                        <span id="modalPracticeStatus" class="text-sm font-bold">-</span>
+                    </div>
+
+                    <!-- รายละเอียดการลาแบบตาราง -->
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-blue-50 text-blue-900 font-semibold text-xs border-b border-slate-200">
+                                    <th class="p-3.5">ประเภทการลา</th>
+                                    <th class="p-3.5">รายชื่อผู้ลา</th>
+                                    <th class="p-3.5">หมายเหตุ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-blue-950 whitespace-nowrap">
+                                        <i class="fas fa-user-times text-rose-500 mr-1.5"></i>ลาทั้งวัน
+                                    </td>
+                                    <td id="modalFullLeaveNames" class="p-3.5 font-medium text-slate-800">-</td>
+                                    <td id="modalFullLeaveNote" class="p-3.5 text-xs text-slate-600">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-blue-950 whitespace-nowrap">
+                                        <i class="fas fa-user-clock text-amber-500 mr-1.5"></i>ลาเฉพาะช่วงเวลา
+                                    </td>
+                                    <td id="modalPartLeaveNames" class="p-3.5 font-medium text-slate-800">-</td>
+                                    <td id="modalPartLeaveNote" class="p-3.5 text-xs text-slate-600">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
+                    <button onclick="closeScheduleModal()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition">
+                        ปิดหน้าต่าง
+                    </button>
+                </div>
+
+            </div>
         </div>
 
         <!-- ========================================== -->
@@ -291,7 +310,7 @@
                     </div>
                 </div>
 
-                <!-- เพิ่มส่วนแสดงผลกราฟแผนภูมิวงกลม (Payment / Expense Breakdown Chart) -->
+                <!-- แสดงผลกราฟแผนภูมิวงกลม (Payment / Expense Breakdown Chart) -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center space-x-2">
                         <i class="fa-solid fa-chart-pie text-blue-600"></i>
@@ -432,7 +451,7 @@
         };
 
         function switchScheduleTab(tabName) {
-            ['today', 'upcoming', 'calendar', 'history'].forEach(tab => {
+            ['today', 'calendar'].forEach(tab => {
                 document.getElementById(`schedule-page-${tab}`).classList.add('hidden');
                 document.getElementById(`tab-schedule-${tab}`).classList.remove('sub-tab-active');
             });
@@ -513,8 +532,6 @@
                 rawScheduleData.sort((a, b) => a.dateObj - b.dateObj);
 
                 renderTodaySchedule();
-                renderUpcomingSchedule();
-                renderHistorySchedule();
                 renderCalendarSchedule();
 
                 const now = new Date();
@@ -556,81 +573,6 @@
             }
         }
 
-        function renderUpcomingSchedule() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const upcoming = rawScheduleData.filter(d => {
-                const dDate = new Date(d.dateObj);
-                dDate.setHours(0, 0, 0, 0);
-                return dDate.getTime() >= today.getTime();
-            });
-
-            document.getElementById('upcomingCount').innerText = `${upcoming.length} รายการ`;
-            const tbody = document.getElementById('scheduleTableBody');
-            tbody.innerHTML = '';
-
-            if (upcoming.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-blue-900/40">ไม่มีรายการซ้อมในอนาคต</td></tr>`;
-                return;
-            }
-
-            upcoming.forEach(d => {
-                const isToday = new Date(d.dateObj).setHours(0,0,0,0) === today.getTime();
-                const tr = document.createElement('tr');
-                if (isToday) tr.className = "bg-blue-50/70 font-medium";
-
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-semibold text-blue-950">${d.dateStr} <span class="text-xs font-normal text-blue-700/60">(${d.dayOfWeek})</span> ${isToday ? '<span class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full ml-1 font-normal">วันนี้</span>' : ''}</td>
-                    <td class="py-3 px-4">${renderStatusBadge(d.status)}</td>
-                    <td class="py-3 px-4 font-medium text-blue-900">${d.fullLeaveNames || '-'}</td>
-                    <td class="py-3 px-4 text-xs text-blue-800/80">${d.fullLeaveNote || '-'}</td>
-                    <td class="py-3 px-4 font-medium text-sky-800">${d.partLeaveNames || '-'}</td>
-                    <td class="py-3 px-4 text-xs text-blue-800/80">${d.partLeaveNote || '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderHistorySchedule() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const history = rawScheduleData.filter(d => {
-                const dDate = new Date(d.dateObj);
-                dDate.setHours(0, 0, 0, 0);
-                return dDate.getTime() < today.getTime();
-            }).reverse();
-
-            document.getElementById('historyCount').innerText = `${history.length} รายการ`;
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-
-            if (history.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-blue-900/40">ไม่มีข้อมูลประวัติย้อนหลัง</td></tr>`;
-                return;
-            }
-
-            history.forEach(d => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium text-blue-950">${d.dateStr} <span class="text-xs text-blue-700/50">(${d.dayOfWeek})</span></td>
-                    <td class="py-3 px-4">${renderStatusBadge(d.status)}</td>
-                    <td class="py-3 px-4 text-blue-900">${d.fullLeaveNames || '-'}</td>
-                    <td class="py-3 px-4 text-xs text-blue-800/70">${d.fullLeaveNote || '-'}</td>
-                    <td class="py-3 px-4 text-blue-900">${d.partLeaveNames || '-'}</td>
-                    <td class="py-3 px-4 text-xs text-blue-800/70">${d.partLeaveNote || '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderStatusBadge(status) {
-            if (!status) return '<span class="px-2.5 py-1 text-xs rounded-md bg-blue-50 text-blue-800 font-medium border border-blue-200">มีซ้อม</span>';
-            if (status.includes('งดซ้อม')) return `<span class="px-2.5 py-1 text-xs rounded-md bg-slate-100 text-slate-700 font-medium border border-slate-200">${status}</span>`;
-            return `<span class="px-2.5 py-1 text-xs rounded-md bg-blue-100 text-blue-900 font-medium border border-blue-200">${status}</span>`;
-        }
-
         function renderCalendarSchedule() {
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
@@ -663,7 +605,10 @@
                 const isToday = cellDate.getTime() === new Date().setHours(0,0,0,0);
 
                 const cell = document.createElement('div');
-                cell.className = `h-24 p-2 rounded-lg border flex flex-col justify-between text-xs transition ${isToday ? 'border-blue-500 bg-blue-50/50' : 'border-blue-100 bg-white'}`;
+                cell.className = `h-24 p-2 rounded-lg border flex flex-col justify-between text-xs transition cursor-pointer hover:shadow-md hover:border-blue-400 ${isToday ? 'border-blue-500 bg-blue-50/50' : 'border-blue-100 bg-white'}`;
+                
+                // เพิ่ม Event Listener คลิกเพื่อเปิด Pop-up แสดงรายละเอียด
+                cell.onclick = () => openScheduleModal(cellDate, dayData);
 
                 let statusContent = '';
                 if (dayData) {
@@ -689,6 +634,43 @@
                 grid.appendChild(cell);
             }
         }
+
+        // Function สำหรับเปิด Pop-up Modal แสดงรายละเอียดวันซ้อม
+        function openScheduleModal(dateObj, data) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = dateObj.toLocaleDateString('th-TH', options);
+
+            document.getElementById('modalDateTitle').innerText = data ? `${data.dateStr}` : formattedDate;
+            document.getElementById('modalDayOfWeek').innerText = data ? `วัน${data.dayOfWeek}` : formattedDate;
+            
+            if (data) {
+                document.getElementById('modalPracticeStatus').innerHTML = renderStatusBadge(data.status);
+                document.getElementById('modalFullLeaveNames').innerText = data.fullLeaveNames || 'ไม่มีผู้ลาทั้งวัน';
+                document.getElementById('modalFullLeaveNote').innerText = data.fullLeaveNote || '-';
+                document.getElementById('modalPartLeaveNames').innerText = data.partLeaveNames || 'ไม่มีผู้ลาช่วงเวลา';
+                document.getElementById('modalPartLeaveNote').innerText = data.partLeaveNote || '-';
+            } else {
+                document.getElementById('modalPracticeStatus').innerHTML = '<span class="text-slate-400 font-normal">ไม่มีข้อมูลการซ้อม</span>';
+                document.getElementById('modalFullLeaveNames').innerText = '-';
+                document.getElementById('modalFullLeaveNote').innerText = '-';
+                document.getElementById('modalPartLeaveNames').innerText = '-';
+                document.getElementById('modalPartLeaveNote').innerText = '-';
+            }
+
+            document.getElementById('scheduleDetailModal').classList.remove('hidden');
+        }
+
+        // Function ปิด Pop-up Modal
+        function closeScheduleModal() {
+            document.getElementById('scheduleDetailModal').classList.add('hidden');
+        }
+
+        // ปิด Modal เมื่อคลิกพื้นหลังภายนอก
+        document.getElementById('scheduleDetailModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'scheduleDetailModal') {
+                closeScheduleModal();
+            }
+        });
 
         function changeMonth(offset) {
             currentCalDate.setMonth(currentCalDate.getMonth() + offset);
@@ -739,7 +721,6 @@
         function renderFinanceChart(eqExpense, genExpense, balance) {
             const ctx = document.getElementById('financePieChart').getContext('2d');
             
-            // ลบกราฟเดิมก่อนสร้างใหม่ป้องกันปัญหาแสดงผลซ้อนกัน
             if (financeChart) {
                 financeChart.destroy();
             }
