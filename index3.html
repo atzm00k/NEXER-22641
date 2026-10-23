@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXER 22641 - ตารางซ้อม & สรุปบัญชีการเงินทีมหุ่นยนต์</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-navy: #0F172A;
+            --accent-blue: #1D4ED8;
+            --accent-sky: #0284C7;
+            --border-color: #E2E8F0;
+        }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
+        }
+        .main-tab-active {
+            background-color: #0F172A !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+        }
+        .sub-tab-active {
+            border-bottom: 3px solid #1D4ED8 !important;
+            color: #1D4ED8 !important;
+            font-weight: 600 !important;
+        }
+        .finance-sub-tab-active {
+            background-color: #0F172A !important;
+            color: #FFFFFF !important;
+        }
+        .badge-income { color: #059669; font-weight: 600; }
+        .badge-expense { color: #E11D48; font-weight: 600; }
+        .type-tag {
+            background: #E0F2FE;
+            color: #0369A1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            display: inline-block;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-900 bg-slate-50">
+
+    <!-- Header / Branding & Main Navigation -->
+    <header class="bg-white border-b-2 border-slate-900 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                
+                <!-- Brand & Team Name (ขนาดใหญ่และเห็นชัดเจน) -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-blue-900/20">
+                        N
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">NEXER</span>
+                            <span class="text-2xl sm:text-3xl font-extrabold tracking-tight text-sky-600">22641</span>
+                        </div>
+                        <p class="text-xs font-semibold text-blue-900/70 tracking-wide uppercase">Robotics Team Management System</p>
+                    </div>
+                </div>
+
+                <!-- Main Section Toggle Tabs (สลับ ตารางซ้อม / บัญชีการเงิน) -->
+                <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <button onclick="switchMainView('schedule-system')" id="main-btn-schedule" class="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-2 rounded-lg font-bold text-sm text-slate-600 transition duration-200 main-tab-active">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>ตารางซ้อมทีม</span>
+                    </button>
+                    <button onclick="switchMainView('finance-system')" id="main-btn-finance" class="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-2 rounded-lg font-bold text-sm text-slate-600 transition duration-200">
+                        <i class="fas fa-wallet"></i>
+                        <span>ระบบบัญชีการเงิน</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: SYSTEM - ตารางซ้อมทีม           -->
+        <!-- ========================================== -->
+        <div id="main-view-schedule" class="space-y-6">
+            
+            <!-- Schedule Navigation Header Bar -->
+            <div class="bg-white border border-blue-100 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+                    <button onclick="switchScheduleTab('today')" id="tab-schedule-today" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap sub-tab-active">
+                        <i class="fas fa-calendar-day mr-1.5"></i>วันนี้ (Mainหลัก)
+                    </button>
+                    <button onclick="switchScheduleTab('upcoming')" id="tab-schedule-upcoming" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                        <i class="fas fa-list-ul mr-1.5"></i>ตารางซ้อมปัจจุบัน/อนาคต
+                    </button>
+                    <button onclick="switchScheduleTab('calendar')" id="tab-schedule-calendar" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                        <i class="fas fa-calendar-grid mr-1.5"></i>มุมมองปฏิทิน
+                    </button>
+                    <button onclick="switchScheduleTab('history')" id="tab-schedule-history" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                        <i class="fas fa-history mr-1.5"></i>ประวัติย้อนหลัง
+                    </button>
+                </nav>
+
+                <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                    <span id="scheduleLastUpdated" class="text-xs text-slate-500 hidden sm:inline-block">อัปเดตล่าสุด: -</span>
+                    <button onclick="fetchScheduleData()" class="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 transition flex items-center space-x-2">
+                        <i id="scheduleRefreshIcon" class="fas fa-sync-alt"></i>
+                        <span>อัปเดตข้อมูล</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="scheduleLoading" class="flex flex-col items-center justify-center py-16">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-4"></i>
+                <p class="text-blue-900 text-base font-medium">กำลังดึงข้อมูลตารางซ้อมจาก Google Sheet...</p>
+            </div>
+
+            <!-- Sub Tab 1: วันนี้ -->
+            <div id="schedule-page-today" class="space-y-6 hidden">
+                <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 border border-blue-700 rounded-2xl p-6 sm:p-8 shadow-md text-white">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-blue-700/60 pb-4 mb-6">
+                        <div>
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white mb-2">วันนี้</span>
+                            <h2 id="todayDateStr" class="text-2xl sm:text-3xl font-bold text-white">-</h2>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/20 text-center">
+                            <span class="text-xs text-blue-100 block">สถานะการซ้อมวันนี้</span>
+                            <span id="todayPracticeStatus" class="text-lg font-bold text-white">-</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-900">
+                        <div class="bg-white rounded-xl p-5 border border-blue-100 shadow-sm">
+                            <div class="flex items-center space-x-2 text-blue-800 font-semibold mb-3">
+                                <i class="fas fa-user-times"></i>
+                                <span>ผู้ลา (ทั้งวัน)</span>
+                            </div>
+                            <div id="todayFullLeaveNames" class="text-lg font-bold text-blue-950 mb-2">ไม่มีผู้ลา</div>
+                            <div class="text-xs text-blue-700 font-semibold mb-1">หมายเหตุ:</div>
+                            <p id="todayFullLeaveNote" class="text-sm text-blue-900/80 bg-blue-50/50 p-3 rounded-lg border border-blue-100">-</p>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-5 border border-blue-100 shadow-sm">
+                            <div class="flex items-center space-x-2 text-sky-800 font-semibold mb-3">
+                                <i class="fas fa-user-clock"></i>
+                                <span>ผู้ลา (เจาะจงช่วงเวลา)</span>
+                            </div>
+                            <div id="todayPartLeaveNames" class="text-lg font-bold text-blue-950 mb-2">ไม่มีผู้ลา</div>
+                            <div class="text-xs text-sky-700 font-semibold mb-1">หมายเหตุ:</div>
+                            <p id="todayPartLeaveNote" class="text-sm text-blue-900/80 bg-blue-50/50 p-3 rounded-lg border border-blue-100">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub Tab 2: ตารางปัจจุบัน/อนาคต -->
+            <div id="schedule-page-upcoming" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-blue-950">ตารางซ้อมตั้งแต่วันนี้เป็นต้นไป</h2>
+                    <span id="upcomingCount" class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full">0 รายการ</span>
+                </div>
+                <div class="overflow-x-auto bg-white border border-blue-100 rounded-xl shadow-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-blue-50/80 border-b border-blue-100 text-xs font-semibold text-blue-900 uppercase">
+                                <th class="py-3 px-4">วันที่ / วัน</th>
+                                <th class="py-3 px-4">สถานะการซ้อม</th>
+                                <th class="py-3 px-4">ผู้ลาทั้งวัน</th>
+                                <th class="py-3 px-4">หมายเหตุ</th>
+                                <th class="py-3 px-4">ผู้ลาช่วงเวลา</th>
+                                <th class="py-3 px-4">หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTableBody" class="divide-y divide-blue-50 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sub Tab 3: ปฏิทิน -->
+            <div id="schedule-page-calendar" class="hidden">
+                <div class="bg-white border border-blue-100 rounded-xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="calendarMonthYear" class="text-xl font-bold text-blue-950">ปฏิทินซ้อม</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="changeMonth(-1)" class="p-2 border border-blue-200 rounded-lg hover:bg-blue-50 text-blue-700"><i class="fas fa-chevron-left"></i></button>
+                            <button onclick="changeMonth(1)" class="p-2 border border-blue-200 rounded-lg hover:bg-blue-50 text-blue-700"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-center font-semibold text-blue-900/70 text-xs mb-2">
+                        <div class="text-sky-600">อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div class="text-blue-600">ส.</div>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Sub Tab 4: ประวัติย้อนหลัง -->
+            <div id="schedule-page-history" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-blue-950">ประวัติการซ้อมย้อนหลัง</h2>
+                    <span id="historyCount" class="text-xs bg-blue-50 text-blue-800 font-semibold px-2.5 py-1 rounded-full">0 รายการ</span>
+                </div>
+                <div class="overflow-x-auto bg-white border border-blue-100 rounded-xl shadow-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-blue-50/50 border-b border-blue-100 text-xs font-semibold text-blue-900/80 uppercase">
+                                <th class="py-3 px-4">วันที่ / วัน</th>
+                                <th class="py-3 px-4">สถานะการซ้อม</th>
+                                <th class="py-3 px-4">ผู้ลาทั้งวัน</th>
+                                <th class="py-3 px-4">หมายเหตุ</th>
+                                <th class="py-3 px-4">ผู้ลาช่วงเวลา</th>
+                                <th class="py-3 px-4">หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody" class="divide-y divide-blue-50 text-sm text-blue-950"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: SYSTEM - บัญชีการเงินทีม         -->
+        <!-- ========================================== -->
+        <div id="main-view-finance" class="hidden space-y-6">
+
+            <!-- Controls & Sub Tabs Bar -->
+            <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <!-- Finance Sub Nav Buttons -->
+                <nav class="flex space-x-1 overflow-x-auto bg-slate-100 p-1 rounded-lg">
+                    <button onclick="switchFinanceTab('summary')" id="tab-fin-summary" class="fin-tab-btn px-3 py-1.5 text-xs font-semibold rounded-md text-slate-700 hover:text-slate-900 whitespace-nowrap finance-sub-tab-active"><i class="fa-solid fa-chart-pie mr-1"></i>สรุปบัญชี</button>
+                    <button onclick="switchFinanceTab('recent')" id="tab-fin-recent" class="fin-tab-btn px-3 py-1.5 text-xs font-semibold rounded-md text-slate-700 hover:text-slate-900 whitespace-nowrap"><i class="fa-solid fa-clock-rotate-left mr-1"></i>รายการล่าสุด</button>
+                    <button onclick="switchFinanceTab('expenses')" id="tab-fin-expenses" class="fin-tab-btn px-3 py-1.5 text-xs font-semibold rounded-md text-slate-700 hover:text-slate-900 whitespace-nowrap"><i class="fa-solid fa-receipt mr-1"></i>รายจ่าย</button>
+                    <button onclick="switchFinanceTab('income')" id="tab-fin-income" class="fin-tab-btn px-3 py-1.5 text-xs font-semibold rounded-md text-slate-700 hover:text-slate-900 whitespace-nowrap"><i class="fa-solid fa-wallet mr-1"></i>รายรับ</button>
+                    <button onclick="switchFinanceTab('sponsor')" id="tab-fin-sponsor" class="fin-tab-btn px-3 py-1.5 text-xs font-semibold rounded-md text-slate-700 hover:text-slate-900 whitespace-nowrap"><i class="fa-solid fa-handshake mr-1"></i>Sponsor</button>
+                </nav>
+
+                <!-- Search & Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInput" onkeyup="filterFinanceTables()" placeholder="ค้นหารายการ, ชื่อ..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-slate-900">
+                    </div>
+                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                        <button onclick="loadAllFinanceData()" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-rotate" id="finRefreshIcon"></i>
+                            <span>รีเฟรช</span>
+                        </button>
+                        <a href="https://docs.google.com/spreadsheets/d/1hJGYVIJLxOk-55_mGcaIWNk3tEJlOAYQncBDOb0yd-Q/edit?usp=sharing" target="_blank" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition flex items-center space-x-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span>คลังใบเสร็จ & Sheet</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FIN TAB 1: สรุปภาพรวม -->
+            <div id="fin-page-summary" class="space-y-6">
+                <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-950 rounded-2xl p-6 sm:p-8 text-white shadow-lg border border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <div class="text-slate-300 text-sm font-medium mb-1 flex items-center space-x-2">
+                            <i class="fa-solid fa-vault text-sky-400"></i>
+                            <span>ยอดเงินคงเหลือในบัญชีปัจจุบัน</span>
+                        </div>
+                        <div class="text-3xl sm:text-4xl font-extrabold text-sky-300 tracking-tight" id="sum-balance">กำลังโหลด...</div>
+                    </div>
+                    <span class="text-xs px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium">
+                        <i class="fa-solid fa-sync mr-1"></i> Real-time Sync
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-circle-arrow-down text-emerald-600 mr-1"></i>รายรับรวมทั้งหมด</div>
+                        <div class="text-xl font-bold text-emerald-600" id="sum-income">0.00 ฿</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-circle-arrow-up text-rose-600 mr-1"></i>รายจ่ายรวมทั้งหมด</div>
+                        <div class="text-xl font-bold text-rose-600" id="sum-expense">0.00 ฿</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-microchip text-slate-700 mr-1"></i>รวมค่าอุปกรณ์</div>
+                        <div class="text-xl font-bold text-slate-800" id="sum-eq-expense">0.00 ฿</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs text-slate-500 font-medium mb-1"><i class="fa-solid fa-boxes-packing text-slate-700 mr-1"></i>รวมค่าใช้จ่ายทั่วไป</div>
+                        <div class="text-xl font-bold text-slate-800" id="sum-gen-expense">0.00 ฿</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FIN TAB 2: รายการล่าสุด -->
+            <div id="fin-page-recent" class="hidden space-y-4">
+                <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-clock-rotate-left mr-2"></i>รายการอัปเดตล่าสุด (เรียงตามวัน-เวลา)</h3>
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto p-2">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200">
+                                <th class="p-3">วัน / เวลา</th>
+                                <th class="p-3">ประเภท</th>
+                                <th class="p-3">รายการ / ชื่อ-นามสกุล</th>
+                                <th class="p-3 text-right">จำนวนเงิน (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-recent" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FIN TAB 3: รายจ่าย -->
+            <div id="fin-page-expenses" class="hidden space-y-6">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-3"><i class="fa-solid fa-microchip mr-2"></i>รายจ่ายค่าอุปกรณ์</h3>
+                    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto p-2">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200">
+                                    <th class="p-3">วัน / เวลา</th>
+                                    <th class="p-3">รายการอุปกรณ์</th>
+                                    <th class="p-3">จำนวน</th>
+                                    <th class="p-3 text-right">ราคา (รวม)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-eq-expenses" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-3"><i class="fa-solid fa-receipt mr-2"></i>รายจ่ายทั่วไป</h3>
+                    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto p-2">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200">
+                                    <th class="p-3">วัน / เวลา</th>
+                                    <th class="p-3">รายการ</th>
+                                    <th class="p-3 text-right">ราคา</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-gen-expenses" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FIN TAB 4: รายรับ -->
+            <div id="fin-page-income" class="hidden space-y-4">
+                <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-wallet mr-2"></i>รายการรายรับทั้งหมด</h3>
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-x-auto p-2">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200">
+                                <th class="p-3">วัน / เวลา</th>
+                                <th class="p-3">ชื่อ-นามสกุล / รายการ</th>
+                                <th class="p-3 text-right">จำนวนเงิน (บาท)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-income" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FIN TAB 5: Sponsor -->
+            <div id="fin-page-sponsor" class="hidden space-y-4">
+                <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-handshake mr-2"></i>ผู้สนับสนุนทีม (Sponsor)</h3>
+                <div id="sponsor-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium">
+            NEXER 22641 Robotics Team &copy; 2026 | Real-time Management Dashboard
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // ==========================================
+        // MAIN VIEW SWITCHER (ตารางซ้อม / การเงิน)
+        // ==========================================
+        function switchMainView(viewType) {
+            const schedView = document.getElementById('main-view-schedule');
+            const finView = document.getElementById('main-view-finance');
+            const schedBtn = document.getElementById('main-btn-schedule');
+            const finBtn = document.getElementById('main-btn-finance');
+
+            if (viewType === 'schedule-system') {
+                schedView.classList.remove('hidden');
+                finView.classList.add('hidden');
+                schedBtn.classList.add('main-tab-active');
+                finBtn.classList.remove('main-tab-active');
+            } else {
+                schedView.classList.add('hidden');
+                finView.classList.remove('hidden');
+                schedBtn.classList.remove('main-tab-active');
+                finBtn.classList.add('main-tab-active');
+                loadAllFinanceData(); // Auto load finance data when switched
+            }
+        }
+
+        // ==========================================
+        // 1. SCHEDULE SYSTEM LOGIC
+        // ==========================================
+        const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1T1CSPLRSY6X1RDMv3feAFZ0hSMVFSjOz8nWOjkjjjcE/gviz/tq?tqx=out:csv';
+        let rawScheduleData = [];
+        let currentCalDate = new Date();
+
+        const thaiMonths = {
+            'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5,
+            'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11
+        };
+
+        function switchScheduleTab(tabName) {
+            ['today', 'upcoming', 'calendar', 'history'].forEach(tab => {
+                document.getElementById(`schedule-page-${tab}`).classList.add('hidden');
+                document.getElementById(`tab-schedule-${tab}`).classList.remove('sub-tab-active');
+            });
+            document.getElementById(`schedule-page-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-schedule-${tabName}`).classList.add('sub-tab-active');
+        }
+
+        function parseThaiDate(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.trim().split(/\s+/);
+            if (parts.length < 3) return null;
+            const day = parseInt(parts[0], 10);
+            const monthStr = parts[1];
+            let year = parseInt(parts[2], 10);
+            if (year < 100) year += 2500;
+            year -= 543;
+            const month = thaiMonths[monthStr];
+            if (month === undefined || isNaN(day) || isNaN(year)) return null;
+            return new Date(year, month, day);
+        }
+
+        function parseCSVLines(text) {
+            const lines = text.split('\n');
+            const result = [];
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const row = [];
+                let insideQuote = false;
+                let entry = '';
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        insideQuote = !insideQuote;
+                    } else if (char === ',' && !insideQuote) {
+                        row.push(entry.replace(/^"|"$/g, '').trim());
+                        entry = '';
+                    } else {
+                        entry += char;
+                    }
+                }
+                row.push(entry.replace(/^"|"$/g, '').trim());
+                result.push(row);
+            }
+            return result;
+        }
+
+        async function fetchScheduleData() {
+            const refreshIcon = document.getElementById('scheduleRefreshIcon');
+            if (refreshIcon) refreshIcon.classList.add('fa-spin');
+            document.getElementById('scheduleLoading').classList.remove('hidden');
+
+            try {
+                const response = await fetch(SCHEDULE_CSV_URL + '&timestamp=' + new Date().getTime());
+                const csvText = await response.text();
+                const parsedRows = parseCSVLines(csvText);
+
+                rawScheduleData = [];
+                for (let i = 1; i < parsedRows.length; i++) {
+                    const row = parsedRows[i];
+                    if (row.length >= 3 && row[0]) {
+                        const dateObj = parseThaiDate(row[0]);
+                        if (dateObj) {
+                            rawScheduleData.push({
+                                dateStr: row[0],
+                                dayOfWeek: row[1] || '',
+                                status: row[2] || '',
+                                fullLeaveNames: row[3] || '',
+                                fullLeaveNote: row[4] || '',
+                                partLeaveNames: row[5] || '',
+                                partLeaveNote: row[6] || '',
+                                dateObj: dateObj
+                            });
+                        }
+                    }
+                }
+
+                rawScheduleData.sort((a, b) => a.dateObj - b.dateObj);
+
+                renderTodaySchedule();
+                renderUpcomingSchedule();
+                renderHistorySchedule();
+                renderCalendarSchedule();
+
+                const now = new Date();
+                document.getElementById('scheduleLastUpdated').innerText = `อัปเดตล่าสุด: ${now.toLocaleTimeString('th-TH')}`;
+
+            } catch (err) {
+                console.error('Error fetching schedule data:', err);
+            } finally {
+                if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+                document.getElementById('scheduleLoading').classList.add('hidden');
+            }
+        }
+
+        function renderTodaySchedule() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayData = rawScheduleData.find(d => {
+                const dDate = new Date(d.dateObj);
+                dDate.setHours(0, 0, 0, 0);
+                return dDate.getTime() === today.getTime();
+            });
+
+            if (todayData) {
+                document.getElementById('todayDateStr').innerText = `${todayData.dateStr} (${todayData.dayOfWeek})`;
+                document.getElementById('todayPracticeStatus').innerText = todayData.status || 'มีการซ้อมตามปกติ';
+                document.getElementById('todayFullLeaveNames').innerText = todayData.fullLeaveNames || 'ไม่มีผู้ลาทั้งวัน';
+                document.getElementById('todayFullLeaveNote').innerText = todayData.fullLeaveNote || '-';
+                document.getElementById('todayPartLeaveNames').innerText = todayData.partLeaveNames || 'ไม่มีผู้ลาช่วงเวลา';
+                document.getElementById('todayPartLeaveNote').innerText = todayData.partLeaveNote || '-';
+            } else {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('todayDateStr').innerText = today.toLocaleDateString('th-TH', options);
+                document.getElementById('todayPracticeStatus').innerText = 'ไม่มีข้อมูลการซ้อมสำหรับวันนี้';
+                document.getElementById('todayFullLeaveNames').innerText = 'ไม่มีข้อมูล';
+                document.getElementById('todayFullLeaveNote').innerText = '-';
+                document.getElementById('todayPartLeaveNames').innerText = 'ไม่มีข้อมูล';
+                document.getElementById('todayPartLeaveNote').innerText = '-';
+            }
+        }
+
+        function renderUpcomingSchedule() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const upcoming = rawScheduleData.filter(d => {
+                const dDate = new Date(d.dateObj);
+                dDate.setHours(0, 0, 0, 0);
+                return dDate.getTime() >= today.getTime();
+            });
+
+            document.getElementById('upcomingCount').innerText = `${upcoming.length} รายการ`;
+            const tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = '';
+
+            if (upcoming.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-blue-900/40">ไม่มีรายการซ้อมในอนาคต</td></tr>`;
+                return;
+            }
+
+            upcoming.forEach(d => {
+                const isToday = new Date(d.dateObj).setHours(0,0,0,0) === today.getTime();
+                const tr = document.createElement('tr');
+                if (isToday) tr.className = "bg-blue-50/70 font-medium";
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold text-blue-950">${d.dateStr} <span class="text-xs font-normal text-blue-700/60">(${d.dayOfWeek})</span> ${isToday ? '<span class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full ml-1 font-normal">วันนี้</span>' : ''}</td>
+                    <td class="py-3 px-4">${renderStatusBadge(d.status)}</td>
+                    <td class="py-3 px-4 font-medium text-blue-900">${d.fullLeaveNames || '-'}</td>
+                    <td class="py-3 px-4 text-xs text-blue-800/80">${d.fullLeaveNote || '-'}</td>
+                    <td class="py-3 px-4 font-medium text-sky-800">${d.partLeaveNames || '-'}</td>
+                    <td class="py-3 px-4 text-xs text-blue-800/80">${d.partLeaveNote || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderHistorySchedule() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const history = rawScheduleData.filter(d => {
+                const dDate = new Date(d.dateObj);
+                dDate.setHours(0, 0, 0, 0);
+                return dDate.getTime() < today.getTime();
+            }).reverse();
+
+            document.getElementById('historyCount').innerText = `${history.length} รายการ`;
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-blue-900/40">ไม่มีข้อมูลประวัติย้อนหลัง</td></tr>`;
+                return;
+            }
+
+            history.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-medium text-blue-950">${d.dateStr} <span class="text-xs text-blue-700/50">(${d.dayOfWeek})</span></td>
+                    <td class="py-3 px-4">${renderStatusBadge(d.status)}</td>
+                    <td class="py-3 px-4 text-blue-900">${d.fullLeaveNames || '-'}</td>
+                    <td class="py-3 px-4 text-xs text-blue-800/70">${d.fullLeaveNote || '-'}</td>
+                    <td class="py-3 px-4 text-blue-900">${d.partLeaveNames || '-'}</td>
+                    <td class="py-3 px-4 text-xs text-blue-800/70">${d.partLeaveNote || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderStatusBadge(status) {
+            if (!status) return '<span class="px-2.5 py-1 text-xs rounded-md bg-blue-50 text-blue-800 font-medium border border-blue-200">มีซ้อม</span>';
+            if (status.includes('งดซ้อม')) return `<span class="px-2.5 py-1 text-xs rounded-md bg-slate-100 text-slate-700 font-medium border border-slate-200">${status}</span>`;
+            return `<span class="px-2.5 py-1 text-xs rounded-md bg-blue-100 text-blue-900 font-medium border border-blue-200">${status}</span>`;
+        }
+
+        function renderCalendarSchedule() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            const year = currentCalDate.getFullYear();
+            const month = currentCalDate.getMonth();
+
+            const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year + 543}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = "h-24 bg-blue-50/20 rounded-lg border border-dashed border-blue-100";
+                grid.appendChild(empty);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cellDate = new Date(year, month, day);
+                cellDate.setHours(0,0,0,0);
+
+                const dayData = rawScheduleData.find(d => {
+                    const dDate = new Date(d.dateObj);
+                    dDate.setHours(0,0,0,0);
+                    return dDate.getTime() === cellDate.getTime();
+                });
+
+                const isToday = cellDate.getTime() === new Date().setHours(0,0,0,0);
+
+                const cell = document.createElement('div');
+                cell.className = `h-24 p-2 rounded-lg border flex flex-col justify-between text-xs transition ${isToday ? 'border-blue-500 bg-blue-50/50' : 'border-blue-100 bg-white'}`;
+
+                let statusContent = '';
+                if (dayData) {
+                    if (dayData.status.includes('งดซ้อม')) {
+                        statusContent = `<div class="bg-slate-100 text-slate-700 p-1 rounded font-medium text-[10px] truncate">${dayData.status}</div>`;
+                    } else if (dayData.status) {
+                        statusContent = `<div class="bg-blue-100 text-blue-900 p-1 rounded font-medium text-[10px] truncate">${dayData.status}</div>`;
+                    }
+                    if (dayData.fullLeaveNames) {
+                        statusContent += `<div class="text-blue-800 font-medium text-[10px] truncate">ลา: ${dayData.fullLeaveNames}</div>`;
+                    }
+                }
+
+                cell.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold ${isToday ? 'text-blue-700' : 'text-blue-950'}">${day}</span>
+                        ${isToday ? '<span class="w-2 h-2 rounded-full bg-blue-600"></span>' : ''}
+                    </div>
+                    <div class="space-y-1 overflow-hidden">
+                        ${statusContent}
+                    </div>
+                `;
+                grid.appendChild(cell);
+            }
+        }
+
+        function changeMonth(offset) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + offset);
+            renderCalendarSchedule();
+        }
+
+        // ==========================================
+        // 2. FINANCE SYSTEM LOGIC
+        // ==========================================
+        const FINANCE_SPREADSHEET_ID = '1hJGYVIJLxOk-55_mGcaIWNk3tEJlOAYQncBDOb0yd-Q';
+
+        function switchFinanceTab(tabName) {
+            ['summary', 'recent', 'expenses', 'income', 'sponsor'].forEach(tab => {
+                document.getElementById(`fin-page-${tab}`).classList.add('hidden');
+                document.getElementById(`tab-fin-${tab}`).classList.remove('finance-sub-tab-active');
+            });
+            document.getElementById(`fin-page-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-fin-${tabName}`).classList.add('finance-sub-tab-active');
+        }
+
+        async function fetchFinanceSheetData(sheetName) {
+            const url = `https://docs.google.com/spreadsheets/d/${FINANCE_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+            const response = await fetch(url);
+            const data = await response.text();
+            return parseCSVLines(data);
+        }
+
+        function parseAmount(val) {
+            if (!val) return 0;
+            let clean = val.replace(/,/g, '').replace(/฿/g, '').trim();
+            let num = parseFloat(clean);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function formatCurrency(num) {
+            return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ฿';
+        }
+
+        function filterFinanceTables() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let rows = document.querySelectorAll("#main-view-finance tbody tr");
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        async function loadAllFinanceData() {
+            const refreshIcon = document.getElementById('finRefreshIcon');
+            if(refreshIcon) refreshIcon.classList.add('fa-spin');
+
+            try {
+                // 1. รายรับ
+                const incomeRows = await fetchFinanceSheetData('รายรับ');
+                let incomeList = [];
+                let calcIncomeOnly = 0;
+
+                for (let i = 2; i < incomeRows.length; i++) {
+                    let row = incomeRows[i];
+                    if (row && row[1] && row[1].trim() !== "" && row[1] !== "วันที่") {
+                        let date = row[1] ? row[1].trim() : '';
+                        let time = row[2] ? row[2].trim() : '';
+                        let name = row[3] ? row[3].trim() : '';
+                        let amount = parseAmount(row[4]);
+                        if (amount > 0) {
+                            incomeList.push({ date, time, name, amount, type: 'รายรับ' });
+                            calcIncomeOnly += amount;
+                        }
+                    }
+                }
+
+                let incomeHTML = '';
+                [...incomeList].reverse().forEach(item => {
+                    incomeHTML += `
+                        <tr>
+                            <td class="p-3">${item.date} ${item.time}</td>
+                            <td class="p-3">${item.name}</td>
+                            <td class="p-3 text-right badge-income">+${formatCurrency(item.amount)}</td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('table-income').innerHTML = incomeHTML || '<tr><td colspan="3" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
+
+                // 2. รายจ่ายอุปกรณ์
+                const eqRows = await fetchFinanceSheetData('รายจ่ายอุปกรณ์');
+                let eqExpenseList = [];
+                let calcEq = 0;
+
+                for (let i = 2; i < eqRows.length; i++) {
+                    let row = eqRows[i];
+                    if (row && row[3] && row[3].trim() !== "" && row[3] !== "รายการ") {
+                        let date = row[1] ? row[1].trim() : '';
+                        let time = row[2] ? row[2].trim() : '';
+                        let name = row[3] ? row[3].trim() : '';
+                        let price = parseAmount(row[4]);
+                        let qty = row[5] ? row[5].trim() : '-';
+                        if (name) {
+                            eqExpenseList.push({ date, time, name, price, qty, type: 'รายจ่ายอุปกรณ์' });
+                            calcEq += price;
+                        }
+                    }
+                }
+
+                let eqHTML = '';
+                [...eqExpenseList].reverse().forEach(item => {
+                    eqHTML += `
+                        <tr>
+                            <td class="p-3">${item.date} ${item.time}</td>
+                            <td class="p-3">${item.name}</td>
+                            <td class="p-3">${item.qty}</td>
+                            <td class="p-3 text-right badge-expense">-${formatCurrency(item.price)}</td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('table-eq-expenses').innerHTML = eqHTML || '<tr><td colspan="4" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
+
+                // 3. รายจ่ายทั่วไป
+                const genRows = await fetchFinanceSheetData('รายจ่ายทั่วไป');
+                let genExpenseList = [];
+                let calcGen = 0;
+
+                for (let i = 2; i < genRows.length; i++) {
+                    let row = genRows[i];
+                    if (row && row[3] && row[3].trim() !== "" && row[3] !== "รายการ") {
+                        let date = row[1] ? row[1].trim() : '';
+                        let time = row[2] ? row[2].trim() : '';
+                        let name = row[3] ? row[3].trim() : '';
+                        let price = parseAmount(row[4]);
+                        if (name) {
+                            genExpenseList.push({ date, time, name, price, type: 'รายจ่ายทั่วไป' });
+                            calcGen += price;
+                        }
+                    }
+                }
+
+                let genHTML = '';
+                [...genExpenseList].reverse().forEach(item => {
+                    genHTML += `
+                        <tr>
+                            <td class="p-3">${item.date} ${item.time}</td>
+                            <td class="p-3">${item.name}</td>
+                            <td class="p-3 text-right badge-expense">-${formatCurrency(item.price)}</td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('table-gen-expenses').innerHTML = genHTML || '<tr><td colspan="3" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
+
+                // 4. Sponsor
+                const sponsorRows = await fetchFinanceSheetData('Sponsor');
+                let sponsorHTML = '';
+                let calcSponsorTotal = 0;
+
+                for (let i = 2; i < sponsorRows.length; i++) {
+                    let row = sponsorRows[i];
+                    if (row && row[1]) {
+                        let name = row[1].trim();
+                        let amount = parseAmount(row[2]);
+                        if (name && name !== "บริษัท/ร้านค้า") {
+                            calcSponsorTotal += amount;
+                            sponsorHTML += `
+                                <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+                                    <div class="text-2xl text-slate-800 mb-2"><i class="fa-solid fa-award"></i></div>
+                                    <div class="font-semibold text-slate-900 mb-1">${name}</div>
+                                    <div class="text-emerald-600 font-bold">${formatCurrency(amount)}</div>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+                document.getElementById('sponsor-list').innerHTML = sponsorHTML || '<div class="text-slate-400 text-xs">ไม่มีข้อมูล Sponsor</div>';
+
+                // 5. คำนวณสรุป
+                let totalExpense = calcEq + calcGen;
+                let totalIncome = calcIncomeOnly + calcSponsorTotal;
+                let balance = totalIncome - totalExpense;
+
+                document.getElementById('sum-balance').innerText = formatCurrency(balance);
+                document.getElementById('sum-income').innerText = formatCurrency(totalIncome);
+                document.getElementById('sum-expense').innerText = formatCurrency(totalExpense);
+                document.getElementById('sum-eq-expense').innerText = formatCurrency(calcEq);
+                document.getElementById('sum-gen-expense').innerText = formatCurrency(calcGen);
+
+                // 6. รายการล่าสุด
+                let allTransactions = [
+                    ...incomeList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.amount, isIncome: true, type: 'รายรับ' })),
+                    ...eqExpenseList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.price, isIncome: false, type: 'ค่าอุปกรณ์' })),
+                    ...genExpenseList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.price, isIncome: false, type: 'ค่าทั่วไป' }))
+                ];
+
+                let recentHTML = '';
+                allTransactions.reverse().forEach(item => {
+                    recentHTML += `
+                        <tr>
+                            <td class="p-3">${item.date} ${item.time}</td>
+                            <td class="p-3"><span class="type-tag">${item.type}</span></td>
+                            <td class="p-3">${item.name}</td>
+                            <td class="p-3 text-right ${item.isIncome ? 'badge-income' : 'badge-expense'}">
+                                ${item.isIncome ? '+' : '-'}${formatCurrency(item.amount)}
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('table-recent').innerHTML = recentHTML || '<tr><td colspan="4" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
+
+            } catch (err) {
+                console.error("Error loading finance data: ", err);
+            } finally {
+                if(refreshIcon) refreshIcon.classList.remove('fa-spin');
+            }
+        }
+
+        // INITIALIZE ON LOAD
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchScheduleData();
+            switchScheduleTab('today');
+        });
+    </script>
+</body>
+</html>
