@@ -87,14 +87,14 @@
         <!-- ========================================== -->
         <div id="main-view-schedule" class="space-y-6">
             
-            <!-- Schedule Navigation Header Bar (ย้ายมุมมองปฏิทินมาเป็นอันดับแรก) -->
+            <!-- Schedule Navigation Header Bar (ย้ายมุมมองปฏิทินขึ้นก่อนตารางปัจจุบัน/อนาคตแล้ว) -->
             <div class="bg-white border border-blue-100 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
                 <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
-                    <button onclick="switchScheduleTab('calendar')" id="tab-schedule-calendar" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap sub-tab-active">
-                        <i class="fas fa-calendar-grid mr-1.5"></i>มุมมองปฏิทิน
-                    </button>
-                    <button onclick="switchScheduleTab('today')" id="tab-schedule-today" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                    <button onclick="switchScheduleTab('today')" id="tab-schedule-today" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap sub-tab-active">
                         <i class="fas fa-calendar-day mr-1.5"></i>วันนี้ (Mainหลัก)
+                    </button>
+                    <button onclick="switchScheduleTab('calendar')" id="tab-schedule-calendar" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
+                        <i class="fas fa-calendar-grid mr-1.5"></i>มุมมองปฏิทิน
                     </button>
                     <button onclick="switchScheduleTab('upcoming')" id="tab-schedule-upcoming" class="py-2 px-3 text-sm font-medium text-slate-500 hover:text-blue-600 whitespace-nowrap">
                         <i class="fas fa-list-ul mr-1.5"></i>ตารางซ้อมปัจจุบัน/อนาคต
@@ -116,24 +116,7 @@
                 <p class="text-blue-900 text-base font-medium">กำลังดึงข้อมูลตารางซ้อมจาก Google Sheet...</p>
             </div>
 
-            <!-- Sub Tab 1: มุมมองปฏิทิน (แสดงเป็นหน้าแรก) -->
-            <div id="schedule-page-calendar" class="space-y-4">
-                <div class="bg-white border border-blue-100 rounded-xl p-6 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 id="calendarMonthYear" class="text-xl font-bold text-blue-950">ปฏิทินซ้อม</h2>
-                        <div class="flex space-x-2">
-                            <button onclick="changeMonth(-1)" class="p-2 border border-blue-200 rounded-lg hover:bg-blue-50 text-blue-700"><i class="fas fa-chevron-left"></i></button>
-                            <button onclick="changeMonth(1)" class="p-2 border border-blue-200 rounded-lg hover:bg-blue-50 text-blue-700"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-2 text-center font-semibold text-blue-900/70 text-xs mb-2">
-                        <div class="text-sky-600">อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div class="text-blue-600">ส.</div>
-                    </div>
-                    <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
-                </div>
-            </div>
-
-            <!-- Sub Tab 2: วันนี้ -->
+            <!-- Sub Tab 1: วันนี้ -->
             <div id="schedule-page-today" class="space-y-6 hidden">
                 <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 border border-blue-700 rounded-2xl p-6 sm:p-8 shadow-md text-white">
                     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-blue-700/60 pb-4 mb-6">
@@ -168,6 +151,23 @@
                             <p id="todayPartLeaveNote" class="text-sm text-blue-900/80 bg-blue-50/50 p-3 rounded-lg border border-blue-100">-</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Sub Tab 2: มุมมองปฏิทิน -->
+            <div id="schedule-page-calendar" class="hidden">
+                <div class="bg-white border border-blue-100 rounded-xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="calendarMonthYear" class="text-xl font-bold text-blue-950">ปฏิทินซ้อม</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="changeMonth(-1)" class="p-2 border border-blue-200 rounded-lg hover:bg-blue-50 text-blue-700"><i class="fas fa-chevron-left"></i></button>
+                            <button onclick="changeMonth(1)" class="p-2 border border-blue-200 rounded-lg hover:bg-blue-50 text-blue-700"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-center font-semibold text-blue-900/70 text-xs mb-2">
+                        <div class="text-sky-600">อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div class="text-blue-600">ส.</div>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
                 </div>
             </div>
 
@@ -445,7 +445,7 @@
         };
 
         function switchScheduleTab(tabName) {
-            ['calendar', 'today', 'upcoming'].forEach(tab => {
+            ['today', 'upcoming', 'calendar'].forEach(tab => {
                 const el = document.getElementById(`schedule-page-${tab}`);
                 const btn = document.getElementById(`tab-schedule-${tab}`);
                 if (el) el.classList.add('hidden');
@@ -963,10 +963,10 @@
             }
         }
 
-        // INITIALIZE ON LOAD (ตั้งค่ามุมมองปฏิทินเป็นหน้าแรก)
+        // INITIALIZE ON LOAD
         document.addEventListener('DOMContentLoaded', () => {
             fetchScheduleData();
-            switchScheduleTab('calendar');
+            switchScheduleTab('today');
         });
     </script>
 </body>
