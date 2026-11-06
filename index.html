@@ -63,7 +63,7 @@
                     <img src="LOGO สีดำ.png" alt="NEXER 22641 Logo" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='LOGO ขาว.png';">
                 </div>
 
-                <!-- Main Section Toggle Tabs (สลับให้ ระบบบัญชีการเงิน มาอยู่ด้านหน้า) -->
+                <!-- Main Section Toggle Tabs -->
                 <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
                     <button onclick="switchMainView('finance-system')" id="main-btn-finance" class="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-2 rounded-lg font-bold text-sm text-slate-600 transition duration-200 main-tab-active">
                         <i class="fas fa-wallet"></i>
@@ -83,7 +83,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- ========================================== -->
-        <!-- SECTION 1: SYSTEM - บัญชีการเงินทีม (สลับมาไว้ด้านหน้า) -->
+        <!-- SECTION 1: SYSTEM - บัญชีการเงินทีม         -->
         <!-- ========================================== -->
         <div id="main-view-finance" class="space-y-6">
 
@@ -427,6 +427,10 @@
                 schedView.classList.remove('hidden');
                 finBtn.classList.remove('main-tab-active');
                 schedBtn.classList.add('main-tab-active');
+                
+                // แก้ไขจุดนี้: บังคับเปิดแท็บย่อย 'วันนี้' และเรนเดอร์ข้อมูลทันทีเมื่อกดเข้ามาหน้าตารางซ้อม
+                switchScheduleTab('today');
+                renderTodaySchedule();
             }
         }
 
@@ -960,7 +964,7 @@
             }
         }
 
-        // INITIALIZE ON LOAD (ตั้งค่าเริ่มต้นให้เปิดระบบการเงินขึ้นมาก่อน และโหลดข้อมูลตารางซ้อมเตรียมไว้เบื้องหลัง)
+        // INITIALIZE ON LOAD
         document.addEventListener('DOMContentLoaded', () => {
             fetchScheduleData();
             loadAllFinanceData();
