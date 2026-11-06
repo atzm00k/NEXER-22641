@@ -428,9 +428,13 @@
                 finBtn.classList.remove('main-tab-active');
                 schedBtn.classList.add('main-tab-active');
                 
-                // แก้ไขจุดนี้: บังคับเปิดแท็บย่อย 'วันนี้' และเรนเดอร์ข้อมูลทันทีเมื่อกดเข้ามาหน้าตารางซ้อม
-                switchScheduleTab('today');
-                renderTodaySchedule();
+                // ตรวจสอบว่ามีข้อมูลตารางซ้อมหรือยัง ถ้ายังให้ดึงข้อมูลใหม่ทันที
+                if (rawScheduleData.length === 0) {
+                    fetchScheduleData();
+                } else {
+                    switchScheduleTab('today');
+                    renderTodaySchedule();
+                }
             }
         }
 
@@ -531,6 +535,7 @@
 
                 rawScheduleData.sort((a, b) => a.dateObj - b.dateObj);
 
+                switchScheduleTab('today');
                 renderTodaySchedule();
                 renderUpcomingSchedule();
                 renderCalendarSchedule();
@@ -793,183 +798,4 @@
                                         label += ': ';
                                     }
                                     if (context.parsed !== null) {
-                                        label += context.parsed.toLocaleString('th-TH') + ' ฿';
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        async function loadAllFinanceData() {
-            const refreshIcon = document.getElementById('finRefreshIcon');
-            if(refreshIcon) refreshIcon.classList.add('fa-spin');
-
-            try {
-                const incomeRows = await fetchFinanceSheetData('รายรับ');
-                let incomeList = [];
-                let calcIncomeOnly = 0;
-
-                for (let i = 2; i < incomeRows.length; i++) {
-                    let row = incomeRows[i];
-                    if (row && row[1] && row[1].trim() !== "" && row[1] !== "วันที่") {
-                        let date = row[1] ? row[1].trim() : '';
-                        let time = row[2] ? row[2].trim() : '';
-                        let name = row[3] ? row[3].trim() : '';
-                        let amount = parseAmount(row[4]);
-                        if (amount > 0) {
-                            incomeList.push({ date, time, name, amount, type: 'รายรับ' });
-                            calcIncomeOnly += amount;
-                        }
-                    }
-                }
-
-                let incomeHTML = '';
-                [...incomeList].reverse().forEach(item => {
-                    incomeHTML += `
-                        <tr>
-                            <td class="p-3">${item.date} ${item.time}</td>
-                            <td class="p-3">${item.name}</td>
-                            <td class="p-3 text-right badge-income">+${formatCurrency(item.amount)}</td>
-                        </tr>
-                    `;
-                });
-                document.getElementById('table-income').innerHTML = incomeHTML || '<tr><td colspan="3" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
-
-                const eqRows = await fetchFinanceSheetData('รายจ่ายอุปกรณ์');
-                let eqExpenseList = [];
-                let calcEq = 0;
-
-                for (let i = 2; i < eqRows.length; i++) {
-                    let row = eqRows[i];
-                    if (row && row[3] && row[3].trim() !== "" && row[3] !== "รายการ") {
-                        let date = row[1] ? row[1].trim() : '';
-                        let time = row[2] ? row[2].trim() : '';
-                        let name = row[3] ? row[3].trim() : '';
-                        let price = parseAmount(row[4]);
-                        let qty = row[5] ? row[5].trim() : '-';
-                        if (name) {
-                            eqExpenseList.push({ date, time, name, price, qty, type: 'รายจ่ายอุปกรณ์' });
-                            calcEq += price;
-                        }
-                    }
-                }
-
-                let eqHTML = '';
-                [...eqExpenseList].reverse().forEach(item => {
-                    eqHTML += `
-                        <tr>
-                            <td class="p-3">${item.date} ${item.time}</td>
-                            <td class="p-3">${item.name}</td>
-                            <td class="p-3">${item.qty}</td>
-                            <td class="p-3 text-right badge-expense">-${formatCurrency(item.price)}</td>
-                        </tr>
-                    `;
-                });
-                document.getElementById('table-eq-expenses').innerHTML = eqHTML || '<tr><td colspan="4" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
-
-                const genRows = await fetchFinanceSheetData('รายจ่ายทั่วไป');
-                let genExpenseList = [];
-                let calcGen = 0;
-
-                for (let i = 2; i < genRows.length; i++) {
-                    let row = genRows[i];
-                    if (row && row[3] && row[3].trim() !== "" && row[3] !== "รายการ") {
-                        let date = row[1] ? row[1].trim() : '';
-                        let time = row[2] ? row[2].trim() : '';
-                        let name = row[3] ? row[3].trim() : '';
-                        let price = parseAmount(row[4]);
-                        if (name) {
-                            genExpenseList.push({ date, time, name, price, type: 'รายจ่ายทั่วไป' });
-                            calcGen += price;
-                        }
-                    }
-                }
-
-                let genHTML = '';
-                [...genExpenseList].reverse().forEach(item => {
-                    genHTML += `
-                        <tr>
-                            <td class="p-3">${item.date} ${item.time}</td>
-                            <td class="p-3">${item.name}</td>
-                            <td class="p-3 text-right badge-expense">-${formatCurrency(item.price)}</td>
-                        </tr>
-                    `;
-                });
-                document.getElementById('table-gen-expenses').innerHTML = genHTML || '<tr><td colspan="3" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
-
-                const sponsorRows = await fetchFinanceSheetData('Sponsor');
-                let sponsorHTML = '';
-                let calcSponsorTotal = 0;
-
-                for (let i = 2; i < sponsorRows.length; i++) {
-                    let row = sponsorRows[i];
-                    if (row && row[1]) {
-                        let name = row[1].trim();
-                        let amount = parseAmount(row[2]);
-                        if (name && name !== "บริษัท/ร้านค้า") {
-                            calcSponsorTotal += amount;
-                            sponsorHTML += `
-                                <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
-                                    <div class="text-2xl text-slate-800 mb-2"><i class="fa-solid fa-award"></i></div>
-                                    <div class="font-semibold text-slate-900 mb-1">${name}</div>
-                                    <div class="text-emerald-600 font-bold">${formatCurrency(amount)}</div>
-                                </div>
-                            `;
-                        }
-                    }
-                }
-                document.getElementById('sponsor-list').innerHTML = sponsorHTML || '<div class="text-slate-400 text-xs">ไม่มีข้อมูล Sponsor</div>';
-
-                let totalExpense = calcEq + calcGen;
-                let totalIncome = calcIncomeOnly + calcSponsorTotal;
-                let balance = totalIncome - totalExpense;
-
-                document.getElementById('sum-balance').innerText = formatCurrency(balance);
-                document.getElementById('sum-income').innerText = formatCurrency(totalIncome);
-                document.getElementById('sum-expense').innerText = formatCurrency(totalExpense);
-                document.getElementById('sum-eq-expense').innerText = formatCurrency(calcEq);
-                document.getElementById('sum-gen-expense').innerText = formatCurrency(calcGen);
-
-                renderFinanceChart(calcEq, calcGen, balance);
-
-                let allTransactions = [
-                    ...incomeList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.amount, isIncome: true, type: 'รายรับ' })),
-                    ...eqExpenseList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.price, isIncome: false, type: 'ค่าอุปกรณ์' })),
-                    ...genExpenseList.map(i => ({ date: i.date, time: i.time, name: i.name, amount: i.price, isIncome: false, type: 'ค่าทั่วไป' }))
-                ];
-
-                let recentHTML = '';
-                allTransactions.reverse().forEach(item => {
-                    recentHTML += `
-                        <tr>
-                            <td class="p-3">${item.date} ${item.time}</td>
-                            <td class="p-3"><span class="type-tag">${item.type}</span></td>
-                            <td class="p-3">${item.name}</td>
-                            <td class="p-3 text-right ${item.isIncome ? 'badge-income' : 'badge-expense'}">
-                                ${item.isIncome ? '+' : '-'}${formatCurrency(item.amount)}
-                            </td>
-                        </tr>
-                    `;
-                });
-                document.getElementById('table-recent').innerHTML = recentHTML || '<tr><td colspan="4" class="p-3 text-slate-400 text-center">ไม่มีข้อมูล</td></tr>';
-
-            } catch (err) {
-                console.error("Error loading finance data: ", err);
-            } finally {
-                if(refreshIcon) refreshIcon.classList.remove('fa-spin');
-            }
-        }
-
-        // INITIALIZE ON LOAD
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchScheduleData();
-            loadAllFinanceData();
-            switchFinanceTab('summary');
-        });
-    </script>
-</body>
-</html>
+                                        label += context
